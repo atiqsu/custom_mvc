@@ -12,11 +12,19 @@ foreach ($files as $file) { require($file); }
 
 require './helpers.php';
 require './routes.php';
+require './config.php';
 
 
 $urlInfo = parse_url($_SERVER['REQUEST_URI']);
 
 if(array_key_exists($urlInfo['path'], $routes)) {
+
+    $con = mysqli_connect($dbConfig['host'], $dbConfig['user'], $dbConfig['password'], $dbConfig['database'], $dbConfig['port']);
+
+    if (mysqli_connect_errno()) {
+
+        die("Failed to connect to MySQL: " . mysqli_connect_error());
+    }
 
     $cmStr = $routes[$urlInfo['path']];
 

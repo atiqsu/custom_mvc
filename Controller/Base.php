@@ -11,7 +11,16 @@ namespace Controller;
 
 class Base {
 
+    protected $dbConnection ;
 
+
+    /**
+     *
+     * @author Md. Atiqur Rahman <atiqur.su@gmail.com, atiqur@shaficonsultancy.com>
+     * @param       $filePathWithDotSeparator
+     * @param array $optionalParameter
+     * @return string
+     */
     public static function view($filePathWithDotSeparator, $optionalParameter = []) {
 
         $fullPath = explode('.', $filePathWithDotSeparator);
