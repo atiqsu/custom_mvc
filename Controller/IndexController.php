@@ -15,4 +15,10 @@ class IndexController extends Base {
 
         return self::view('index.welcome');
     }
+
+
+    public function add() {
+
+        return self::view('index.add');
+    }
 }

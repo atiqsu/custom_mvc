@@ -9,5 +9,6 @@
 $routes = [
 
     '/' => 'IndexController@index',
+    '/add' => 'IndexController@add',
 ];
 

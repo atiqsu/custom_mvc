@@ -17,6 +17,8 @@ require './config.php';
 
 $urlInfo = parse_url($_SERVER['REQUEST_URI']);
 
+//dd($_SERVER);
+
 if(array_key_exists($urlInfo['path'], $routes)) {
 
     $con = mysqli_connect($dbConfig['host'], $dbConfig['user'], $dbConfig['password'], $dbConfig['database'], $dbConfig['port']);
