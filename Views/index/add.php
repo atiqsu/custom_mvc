@@ -79,6 +79,14 @@ function getUserIpAddress() {
             padding: 5px;
         }
 
+        .more_item > .form-group {
+            margin-bottom: 5px;
+        }
+
+        .more_item > .form-group:last-child {
+            margin-bottom: 15px;
+        }
+
     </style>
 
 </head>
@@ -89,7 +97,7 @@ function getUserIpAddress() {
     <h1 class="hdr">My First Bootstrap Page</h1>
 
 
-    <form class="frm">
+    <form class="frm" id="prd_frm">
 
         <br/>
 
@@ -117,14 +125,14 @@ function getUserIpAddress() {
         <div class="form-group row">
             <label for="buyer_name" class="col-sm-2 col-form-label">Buyer</label>
             <div class="col-sm-10">
-                <input class="form-control" id="buyer_name" value="" placeholder="Buyer name" maxlength="255">
+                <input class="form-control" id="buyer_name" value="" placeholder="Buyer name" maxlength="20" required >
             </div>
         </div>
 
         <div class="form-group row">
             <label for="buyer_email" class="col-sm-2 col-form-label">Email</label>
             <div class="col-sm-10">
-                <input type="email" class="form-control" id="buyer_email" value="" placeholder="Buyer email" maxlength="50">
+                <input type="email" class="form-control" id="buyer_email" value="" placeholder="Buyer email" maxlength="50" required >
             </div>
         </div>
 
@@ -139,35 +147,41 @@ function getUserIpAddress() {
         <div class="form-group row">
             <label for="receipt_id" class="col-sm-2 col-form-label">Receipt ID</label>
             <div class="col-sm-10">
-                <input class="form-control" id="receipt_id" value="" placeholder="Receipt ID" maxlength="20">
+                <input class="form-control" id="receipt_id" value="" placeholder="Receipt ID" maxlength="20" required />
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row" style="margin-bottom: 0;">
             <label for="items_name" class="col-sm-2 col-form-label">Items</label>
-            <div class="col-sm-10">
-                <input class="form-control" id="items_name" value="" placeholder="Item name..." maxlength="255" />
+            <div class="col-sm-9">
+                <input class="form-control" name="items_name[]" value="" placeholder="Item name..." maxlength="255" required />
+            </div>
+            <div class="col-sm-1">
+                <button class="btn btn-success" onclick="addMoreItemElement(this)"> + </button>
             </div>
         </div>
+
+        <div class="more_item" style="padding: 0 5px;"></div>
+
 
         <div class="form-group row">
             <label for="items_note" class="col-sm-2 col-form-label">Note</label>
             <div class="col-sm-10">
-                <input class="form-control" id="items_note" value="" placeholder="Notes..." maxlength="255" />
+                <textarea name="items_note" id="items_note" rows="5" class="form-control" placeholder="Notes..."></textarea>
             </div>
         </div>
 
         <div class="form-group row">
             <label for="city_name" class="col-sm-2 col-form-label">City</label>
             <div class="col-sm-10">
-                <input class="form-control" id="city_name" value="" placeholder="City name..." maxlength="20" />
+                <input class="form-control" id="city_name" value="" placeholder="City name..." maxlength="20" required />
             </div>
         </div>
 
         <div class="form-group row">
             <label for="phone_no" class="col-sm-2 col-form-label">Phone</label>
             <div class="col-sm-10">
-                <input class="form-control" id="phone_no" value="" placeholder="Phone or mobile number..." maxlength="20" />
+                <input class="form-control" id="phone_no" value="" placeholder="Phone or mobile number..." maxlength="20" required />
             </div>
         </div>
 
@@ -188,7 +202,7 @@ function getUserIpAddress() {
         <div class="form-group row">
             <label for="ip_address" class="col-sm-2 col-form-label">&nbsp; </label>
             <div class="col-sm-10">
-                <button class="btn btn-primary"> Submit </button>
+                <button class="btn btn-primary" id="frm_submit"> Submit </button>
             </div>
         </div>
 
@@ -209,6 +223,319 @@ function getUserIpAddress() {
         elm.value = clientIp;
         elm.readOnly = true;
     }
+
+
+    //equivalent to document.ready in jquery...
+    (function () {
+
+        document.querySelector('#frm_submit').onclick = function (ev) {
+            ev.preventDefault();
+
+
+            let arrayInp = [];
+
+            let buyerName = document.querySelector('#buyer_name').value;
+
+            if(! validateName(buyerName)) {
+
+                showError('buyer_name', 'Only text, spaces and numbers, not more than 20 characters.');
+
+                return false;
+            }
+
+            clearError('buyer_name');
+
+            let buyerEmail  = document.querySelector('#buyer_email').value;
+            let amount      = document.querySelector('#buy_price').value;
+            let receiptId   = document.querySelector('#receipt_id').value;
+
+            if(! validateEmail(buyerEmail)) {
+
+                showError('buyer_email', 'Must be a valid email address and not longer than 50 characters.');
+
+                return false;
+            }
+
+            clearError('buyer_email');
+
+            if(! validateAmount(amount)) {
+
+                showError('buy_price', 'Must be an Integer and less than 9999999999');
+
+                return false;
+            }
+
+            clearError('buy_price');
+
+            if(! validateReceiptId(receiptId)) {
+
+                showError('receipt_id', 'Only text/characters allowed and  not more than 20 characters.');
+
+                return false;
+            }
+
+            clearError('receipt_id');
+
+            let itemsElm = document.querySelectorAll('input[name="items_name[]"]');
+            let first    = itemsElm.item(0);
+
+            if(first.value.trim() === '') {
+
+                showErrorToElm(first, 'Can not be empty and more than 255 characters.');
+
+                return false;
+            }
+
+            clearErrorOfElm(first);
+
+            itemsElm.forEach(function (node) {
+
+                if(node.value.trim() === '') {
+
+                    let nd = node.parentElement.parentNode;
+                    nd.parentElement.removeChild(nd);
+
+                    return;
+                }
+
+                arrayInp.push(node.value);
+            });
+
+
+            itemsElm.forEach(function (node) {
+
+                if(node.value.trim() === '') {
+
+                    let nd = node.parentElement.parentNode;
+                    nd.parentElement.removeChild(nd);
+
+                    return;
+                }
+
+                arrayInp.push(node.value);
+            });
+
+            console.log('Checking inputs.... ', arrayInp);
+
+
+
+        };
+
+
+
+
+    })();
+
+
+
+    /**
+     *
+     * @param amount
+     * @returns {boolean}
+     */
+    function validateAmount(amount) { return /^([1-9]|[1-9]\d+)$/.test(amount) && amount.toString().length < 10; }
+
+
+    /**
+     *
+     * @param name
+     * @returns {boolean}
+     */
+    function validateName(name) {
+
+        let regexp = new RegExp(/^[a-zA-Z0-9 ]{1,20}$/);
+
+        return regexp.test(name)
+    }
+
+
+
+    /**
+     *
+     * @param elmId
+     * @param $msg
+     */
+    function showError(elmId, $msg) {
+
+        let elm = document.querySelector('#'+elmId);
+
+        addCSSClass(elm, 'is-invalid');
+
+        let node = document.createElement("small");
+        let textNode = document.createTextNode($msg);
+
+        node.className = 'text-danger';
+        node.appendChild(textNode);
+
+        elm.parentNode.appendChild(node);
+    }
+
+
+    function showErrorToElm(elm, $msg) {
+
+        addCSSClass(elm, 'is-invalid');
+
+        let node = document.createElement("small");
+        let textNode = document.createTextNode($msg);
+
+        node.className = 'text-danger';
+        node.appendChild(textNode);
+
+        elm.parentNode.appendChild(node);
+    }
+
+
+    /**
+     *
+     * @param elmId
+     * @returns {boolean}
+     */
+    function clearAllError(elmId) {
+
+        document.querySelector('#'+elmId).querySelectorAll('small.text-danger').forEach(function (node) {
+            node.parentNode.removeChild(node);
+        });
+
+
+        return true;
+    }
+
+    /**
+     *
+     * @param elmId
+     * @returns {boolean}
+     */
+    function clearError(elmId) {
+
+        let elm = document.querySelector('#'+elmId);
+
+        elm.parentElement.querySelectorAll('small.text-danger').forEach(function (node) {
+
+            node.parentNode.removeChild(node);
+        });
+
+        removeCSSClass(elm, 'is-invalid');
+
+        return true;
+    }
+
+    function clearErrorOfElm(elm) {
+
+        elm.parentElement.querySelectorAll('small.text-danger').forEach(function (node) {
+
+            node.parentNode.removeChild(node);
+        });
+
+        removeCSSClass(elm, 'is-invalid');
+
+        return true;
+    }
+
+
+    /**
+     *
+     * @param elm
+     * @param $class
+     */
+    function addCSSClass(elm, $class) {
+
+        if (elm.className.split(' ').indexOf($class) < 0) {
+
+            elm.className += " " + $class;
+        }
+    }
+
+
+    /**
+     *
+     * @param elm
+     * @param $class
+     */
+    function removeCSSClass(elm, $class) {
+
+        let cls = elm.className.split(' ');
+
+        let index = cls.indexOf($class);
+
+        if(index > -1) {
+            cls.splice(index, 1);
+        }
+
+        elm.className = cls.join(' ');
+    }
+
+
+    /**
+     *
+     * @param elm
+     */
+    function removeInvalidCharter(elm) {
+
+        elm.value = elm.value.split(/[^a-zA-Z0-9 ]/).join('');
+
+    }
+
+    /**
+     *
+     * @param name
+     * @returns {boolean}
+     */
+    function validateReceiptId(name) {
+
+        let regexp = new RegExp(/^[a-zA-Z]{1,20}$/);
+
+        return regexp.test(name)
+    }
+
+
+    /**
+     *
+     * @param email
+     * @returns {boolean}
+     */
+    function validateEmail(email) {
+        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        return re.test(String(email).toLowerCase()) && email.toString().length < 51;
+    }
+
+
+    /**
+     *
+     * @param btn
+     * @returns {boolean}
+     */
+    function addMoreItemElement(btn) {
+
+        let node = document.createElement("div");
+
+        node.className = 'form-group row';
+
+        node.innerHTML = '<div class="col-sm-9 offset-sm-2">\n' +
+            '                    <input class="form-control" name="items_name[]" value="" placeholder="More Items" maxlength="20" required />\n' +
+            '                </div>\n' +
+            '                <div class="col-sm-1">\n' +
+            '                    <button class="btn btn-danger" onclick="removeThisElement(this)"> X </button>\n' +
+            '                </div>';
+
+        let holder = document.querySelector('.more_item');
+
+        holder.appendChild(node);
+
+        return true;
+    }
+
+    /**
+     *
+     * @param btn
+     */
+    function removeThisElement(btn) {
+
+        let elm = btn.parentElement.parentNode;
+
+        elm.parentElement.removeChild(elm);
+    }
+
 
 </script>
 </body>
