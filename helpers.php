@@ -29,7 +29,6 @@ function dd($arg, $msg = 'I am exiting....') {
     }
 
 
-
     echo '</pre>';
 
     die($msg);
@@ -67,3 +66,48 @@ function ddd() {
 
     die('Exiting....all arguments are dumped!');
 }
+
+
+/**
+ *
+ * @author Md. Atiqur Rahman <atiqur.su@gmail.com, atiqur@shaficonsultancy.com>
+ * @return bool
+ */
+function generateNewSalt() {
+
+    $salt = substr(str_replace('+', '.', base64_encode(md5(mt_rand(), true))), 0, 16);
+
+    $reading = fopen('config.php', 'r');
+    $writing = fopen('config.php.tmp', 'w');
+
+    $replaced = false;
+
+    while(!feof($reading)) {
+
+        $line = fgets($reading);
+
+        if(strrpos($line, '$salt') !== false) {
+
+            $line = '$salt = \'' . $salt . '\';';
+            $replaced = true;
+        }
+
+        fputs($writing, $line);
+    }
+
+    fclose($reading);
+    fclose($writing);
+
+    if($replaced) {
+
+        rename('config.php.tmp', 'config.php');
+
+    } else {
+
+        unlink('config.php.tmp');
+    }
+
+    return true;
+}
+
+

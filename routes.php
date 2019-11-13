@@ -8,7 +8,11 @@
 
 $routes = [
 
-    '/' => 'IndexController@index',
-    '/add' => 'IndexController@add',
+    '/'         => 'IndexController@index',
+    '/add'      => 'IndexController@add',
+    '/create'   => 'IndexController@create',
+
+    #just for generating salt..........................
+    '/regenerate'   => 'IndexController@regenerateSalt',
 ];
 

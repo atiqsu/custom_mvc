@@ -13,3 +13,5 @@ $dbConfig = [
     'password' => '',
     'database' => 'custom_mvc',
 ];
+
+$salt = 'Vqv0k4liJZerhUqY';

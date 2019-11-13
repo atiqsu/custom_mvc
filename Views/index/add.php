@@ -38,6 +38,7 @@ function getUserIpAddress() {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.3.2/bootbox.min.js"></script>
 
     <script>
 
@@ -181,7 +182,7 @@ function getUserIpAddress() {
         <div class="form-group row">
             <label for="phone_no" class="col-sm-2 col-form-label">Phone</label>
             <div class="col-sm-10">
-                <input class="form-control" id="phone_no" value="" placeholder="Phone or mobile number..." maxlength="20" required />
+                <input type="number" class="form-control" id="phone_no" value="" placeholder="Phone or mobile number..." maxlength="20" onblur="prependAreaCode(this)" required />
             </div>
         </div>
 
@@ -195,7 +196,7 @@ function getUserIpAddress() {
         <div class="form-group row">
             <label for="ip_address" class="col-sm-2 col-form-label">IP Address </label>
             <div class="col-sm-10">
-                <input class="form-control" id="ip_address" value="<?=getUserIpAddress()?>">
+                <input class="form-control" readonly id="ip_address" value="<?=getUserIpAddress()?>">
             </div>
         </div>
 
@@ -234,7 +235,13 @@ function getUserIpAddress() {
 
             let arrayInp = [];
 
-            let buyerName = document.querySelector('#buyer_name').value;
+            let buyerName   = document.querySelector('#buyer_name').value;
+            let buyerEmail  = document.querySelector('#buyer_email').value;
+            let amount      = document.querySelector('#buy_price').value;
+            let receiptId   = document.querySelector('#receipt_id').value;
+            let cityName    = document.querySelector('#city_name').value;
+            let phoneNum    = document.querySelector('#phone_no').value;
+            let entryBy     = document.querySelector('#entry_by').value;
 
             if(! validateName(buyerName)) {
 
@@ -245,9 +252,6 @@ function getUserIpAddress() {
 
             clearError('buyer_name');
 
-            let buyerEmail  = document.querySelector('#buyer_email').value;
-            let amount      = document.querySelector('#buy_price').value;
-            let receiptId   = document.querySelector('#receipt_id').value;
 
             if(! validateEmail(buyerEmail)) {
 
@@ -302,23 +306,83 @@ function getUserIpAddress() {
             });
 
 
-            itemsElm.forEach(function (node) {
+            if(! validateCity(cityName)) {
 
-                if(node.value.trim() === '') {
+                showError('city_name', 'Only space & characters are allowed and at least 2 character and no more than 20 characters.');
 
-                    let nd = node.parentElement.parentNode;
-                    nd.parentElement.removeChild(nd);
+                return false;
+            }
 
-                    return;
+            clearError('city_name');
+
+            if(! validatePhone(phoneNum)) {
+
+                showError('phone_no', 'Phone number is required & must contain 880 and can not be longer than 20 characters.');
+
+                return false;
+            }
+
+            clearError('phone_no');
+
+            if(! validateEntryBy(entryBy)) {
+
+                showError('entry_by', 'Only numbers is allowed and can not be longer than 20 characters.');
+
+                return false;
+            }
+
+            clearError('entry_by');
+
+            let itemNote = document.querySelector('#items_note').value;
+            let ipAddress = document.querySelector('#ip_address').value;
+
+
+            let values = {
+                'buyer_name': buyerName,
+                'buyer_email': buyerEmail,
+                'buy_price': amount,
+                'receipt_id': receiptId,
+                'items_name': arrayInp,
+                'items_note': itemNote,
+                'city_name': cityName,
+                'phone_no': phoneNum,
+                'entry_by': entryBy,
+                'ip_address': ipAddress
+            };
+
+            console.log('All the values....', values);
+
+            // let dialog = bootbox.dialog({
+            //     message: '<p class="text-center"><i class="fa fa-spin fa-spinner"></i> Waiting for server response....</p>',
+            //     closeButton: false
+            // });
+
+
+            $.ajax({
+                url: '/create',
+                method: 'POST',
+                data: values,
+                dataType: 'json',
+                success: function (data) {
+
+                    console.log('Hmmm.....', data);
+
+                    if (data.result === 'ok') {
+
+
+
+                    } else {
+
+                    }
+                },
+                error: function (data) {
+
+                    //dialog.modal('hide');
+                },
+                complete: function () {
+
                 }
-
-                arrayInp.push(node.value);
             });
-
-            console.log('Checking inputs.... ', arrayInp);
-
-
-
         };
 
 
@@ -488,6 +552,28 @@ function getUserIpAddress() {
     }
 
 
+    function validateCity(name) {
+
+        let regexp = new RegExp(/^[a-zA-Z][a-zA-Z ]{1,19}$/);
+
+        return regexp.test(name)
+    }
+
+    function validatePhone(name) {
+
+        let regexp = new RegExp(/^(880)[0-9]{1,16}$/);
+
+        return regexp.test(name)
+    }
+
+    function validateEntryBy(name) {
+
+        let regexp = new RegExp(/^[0-9]{1,20}$/);
+
+        return regexp.test(name)
+    }
+
+
     /**
      *
      * @param email
@@ -536,6 +622,20 @@ function getUserIpAddress() {
         elm.parentElement.removeChild(elm);
     }
 
+
+    /**
+     *
+     * @param elm
+     */
+    function prependAreaCode(elm) {
+
+        let val = elm.value;
+
+        if(val.substring(0, 3) !== '880') {
+
+            elm.value = '880' + val;
+        }
+    }
 
 </script>
 </body>

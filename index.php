@@ -5,19 +5,21 @@
  * Time: 12:59 PM
  */
 
+require './config.php';
+require './helpers.php';
+require './routes.php';
+require './Core/Config.php';
 
 $files = glob('./Controller/*Controller.php');
 
 foreach ($files as $file) { require($file); }
 
-require './helpers.php';
-require './routes.php';
-require './config.php';
+$files = glob('./Model/*.php');
+
+foreach ($files as $file) { require($file); }
 
 
 $urlInfo = parse_url($_SERVER['REQUEST_URI']);
-
-//dd($_SERVER);
 
 if(array_key_exists($urlInfo['path'], $routes)) {
 
@@ -28,16 +30,21 @@ if(array_key_exists($urlInfo['path'], $routes)) {
         die("Failed to connect to MySQL: " . mysqli_connect_error());
     }
 
+    $configObj = new \App\Core\Config();
+
+    $configObj->setSalt($salt);
+    $configObj->setDbConnection($con);
+
     $cmStr = $routes[$urlInfo['path']];
 
     $cmStr = explode('@', $cmStr, 2);
 
     $controller = '\Controller\\'.$cmStr[0];
 
-    $ins    = new $controller;
+    $ins    = new $controller($configObj);
     $method = $cmStr[1];
 
-    $response = $ins->$method();
+    $response = $ins->$method($_REQUEST);
 
     if(is_array($response)) {
 

@@ -9,9 +9,42 @@
 namespace Controller;
 
 
+use App\Core\Config;
+
 class Base {
 
-    protected $dbConnection ;
+    protected $dbConnection;
+
+    protected $config;
+
+
+    public function __construct(Config $config) {
+
+        $this->config = $config;
+    }
+
+
+    public function getSalt() {
+
+        return $this->config->getSalt();
+    }
+
+
+    public function getDbConnection() {
+
+        return $this->config->getDbConnection();
+    }
+
+
+    /**
+     * @return Config
+     */
+    public function getConfig(): Config {
+
+        return $this->config;
+    }
+
+
 
 
     /**
@@ -25,7 +58,7 @@ class Base {
 
         $fullPath = explode('.', $filePathWithDotSeparator);
 
-        $fullPath = 'Views/'. implode('/', $fullPath). '.php';
+        $fullPath = 'Views/' . implode('/', $fullPath) . '.php';
 
         ob_start();
 
@@ -34,6 +67,24 @@ class Base {
         $result = ob_get_clean();
 
         return $result;
+    }
+
+
+    /**
+     * Get encrypted string of input
+     *
+     * @author Md. Atiqur Rahman <atiqur.su@gmail.com, atiqur@shaficonsultancy.com>
+     * @param $str
+     * @return string
+     */
+    public function makeHash($str) {
+
+        $salt = $this->getSalt();
+        $rounds = 100; #intentionally done it.....very low :P
+
+        #$6$ ----> SHA512
+
+        return crypt($str, sprintf('$6$rounds=%d$%s$', $rounds, $salt));
     }
 
 
@@ -58,7 +109,6 @@ class Base {
 
             var_dump($arg);
         }
-
 
 
         echo '</pre>';
