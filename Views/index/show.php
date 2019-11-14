@@ -51,7 +51,6 @@
             margin-bottom: 15px;
         }
 
-
         #dt_pkr .input-group-addon {
             padding: 6px 12px;
             font-size: 14px;
@@ -85,6 +84,15 @@
                 <input type="text" class="input-sm form-control" id="max">
             </div>
         </div>
+
+        <div class="col-sm-1">EntryBy:</div>
+
+        <div class="col-sm-4">
+            <select name="entry_by" id="entry_by" class="form-control">
+                <option value="">Select</option>
+            </select>
+        </div>
+
     </div>
     <div class="row">
         <div class="col-sm-12">
@@ -112,11 +120,11 @@
                 foreach($data as $id => $obj) : ?>
 
                     <tr>
-                        <td><?= $obj->buyer?></td>
-                        <td><?= $obj->buyer_email?></td>
-                        <td><?= $obj->amount?></td>
-                        <td><?= $obj->entry_at?></td>
-                        <td><?= $obj->entry_by?></td>
+                        <td><?= $obj->buyer ?></td>
+                        <td><?= $obj->buyer_email ?></td>
+                        <td><?= $obj->amount ?></td>
+                        <td><?= $obj->entry_at ?></td>
+                        <td><?= $obj->entry_by ?></td>
                     </tr>
 
                 <?php endforeach; ?>
@@ -134,7 +142,24 @@
 <script>
 
 
-    $(document).ready( function () {
+    $(document).ready(function () {
+
+        let slt = $('#entry_by');
+        let prdTl = $('#prd_tbl');
+        let uniqueUser = {};
+
+
+        prdTl.find('tbody:first').find('td:nth-child(5)').each(function (idx, elm) {
+
+            var tmp = $(elm).text();
+
+            uniqueUser[tmp] = tmp;
+        });
+
+        Object.keys(uniqueUser).forEach(function (val, idx) {
+            slt.append(new Option(val, val));
+        });
+
 
         $('#min').datepicker({
             format: "yyyy-mm-dd",
@@ -148,12 +173,6 @@
 
         let productTable = $('#prd_tbl').DataTable();
 
-        var filteredData = productTable
-            .column( 0 )
-            .data()
-            .filter( function ( value, index ) {
-                return value > 20 ? true : false;
-            } );
 
         $.fn.dataTable.ext.search.push(
             function (settings, data, dataIndex) {
@@ -174,6 +193,13 @@
 
         $('#min, #max').change(function () {
             productTable.draw();
+        });
+
+        slt.on('change', function (ev) {
+
+            let vl = $(this).val();
+
+            productTable.column(4).search(vl).draw();
         });
 
     });
