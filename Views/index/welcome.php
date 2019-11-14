@@ -16,6 +16,7 @@
     <p>This is some text.</p>
 
     <div><?php echo 'I am from php......' ?></div>
+    <div><?php echo 'I am from controller......'. $passedFromIdx ?></div>
 </div>
 
 </body>

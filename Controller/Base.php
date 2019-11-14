@@ -58,6 +58,8 @@ class Base {
 
         $fullPath = 'Views/' . implode('/', $fullPath) . '.php';
 
+        extract($optionalParameter, EXTR_OVERWRITE);
+
         ob_start();
 
         include $fullPath;

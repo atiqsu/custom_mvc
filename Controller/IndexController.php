@@ -21,7 +21,12 @@ class IndexController extends Base {
      */
     public function index() {
 
-        return self::view('index.welcome');
+        $passedFromIdx = 'hehehe...';
+
+        $data = Products::all($this->getDbConnection());
+
+        return self::view('index.show', compact('passedFromIdx', 'data'));
+        //return self::view('index.welcome', compact('passedFromIdx'));
     }
 
 
@@ -44,10 +49,18 @@ class IndexController extends Base {
      */
     public function create($request) {
 
+        if($_COOKIE['isFormSubmitted'] === 'yes') {
+
+            return array(
+                'msg'    => 'Form is already submitted.',
+                'result' => 'not ok',
+            );
+        }
+
         $hash = $this->makeHash($request['receipt_id']);
 
         $rule = [
-            'buyer_name'  => 'required|regex:/^[a-zA-Z0-9 ]{1,20}$',
+            'buyer_name'  => 'required|regex:/^[a-zA-Z0-9 ]{1,20}$/',
             'buyer_email' => 'required|email',
             'buy_price'   => 'required|integer',
             'receipt_id'  => 'required|regex:/^[a-zA-Z]{1,20}$/',
@@ -63,6 +76,7 @@ class IndexController extends Base {
         if($validator->validate($rule, $request) !== true) {
 
             return array(
+                'msg' => 'Validation failed.',
                 'errors' => $validator->getErrors(),
                 'result' => 'not ok',
             );
@@ -88,6 +102,8 @@ class IndexController extends Base {
         #$model->entry_at    = date('Y-m-d');
 
         if($model->save()) {
+
+            setcookie('isFormSubmitted', 'yes', time()+ (3600 * 24),'/create');
 
             return array(
                 'msg'    => 'Successfully saved into database.',

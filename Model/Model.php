@@ -43,6 +43,37 @@ abstract class Model {
     /**
      *
      * @author Md. Atiqur Rahman <atiqur.su@gmail.com, atiqur@shaficonsultancy.com>
+     * @param \mysqli $dbConnection
+     * @return array
+     */
+    public static function all(\mysqli $dbConnection) {
+
+        $ret = [];
+
+        $model = new static($dbConnection);
+
+        $tbl = empty($model->table) ? strtolower(static::class) : $model->table;
+
+        $qry = 'select * from '.$tbl. ';';
+
+        $result = $dbConnection->query($qry);
+
+
+        while ($row = $result->fetch_assoc()) {
+
+            $ret[$row[$model->primaryKey]] = (object) $row;
+        }
+
+        $result->free();
+
+
+        return $ret;
+    }
+
+
+    /**
+     *
+     * @author Md. Atiqur Rahman <atiqur.su@gmail.com, atiqur@shaficonsultancy.com>
      * @return bool
      */
     public function save() {

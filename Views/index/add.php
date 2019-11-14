@@ -35,10 +35,12 @@ function getUserIpAddress() {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.3.2/bootbox.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.1.7/bootstrap-notify.min.js"></script>
 
     <script>
 
@@ -102,25 +104,6 @@ function getUserIpAddress() {
 
         <br/>
 
-        <!--
-        id (bigint 20) AI
-        buyer (varchar 255) *
-        buyer_email (varchar 50) *
-        amount (int 10) *
-        receipt_id (varchar 20) *
-        items (varchar 255) *
-
-
-        note (text) *
-
-        city (varchar 20) *
-        phone (varchar 20) *
-        entry_by (init 10) *
-
-
-        hash_key (varchar 255)
-        entry_at (date)
-        buyer_ip (varchar 20)  -->
 
 
         <div class="form-group row">
@@ -210,7 +193,6 @@ function getUserIpAddress() {
     </form>
 
 
-    <div><?php echo 'I am from php......' ?></div>
 </div>
 
 
@@ -231,7 +213,6 @@ function getUserIpAddress() {
 
         document.querySelector('#frm_submit').onclick = function (ev) {
             ev.preventDefault();
-
 
             let arrayInp = [];
 
@@ -324,14 +305,14 @@ function getUserIpAddress() {
 
             clearError('phone_no');
 
-            // if(! validateEntryBy(entryBy)) {
-            //
-            //     showError('entry_by', 'Only numbers is allowed and can not be longer than 20 characters.');
-            //
-            //     return false;
-            // }
-            //
-            // clearError('entry_by');
+            if(! validateEntryBy(entryBy)) {
+
+                showError('entry_by', 'Only numbers is allowed and can not be longer than 20 characters.');
+
+                return false;
+            }
+
+            clearError('entry_by');
 
             let itemNote = document.querySelector('#items_note').value;
             let ipAddress = document.querySelector('#ip_address').value;
@@ -352,10 +333,10 @@ function getUserIpAddress() {
 
             console.log('All the values....', values);
 
-            // let dialog = bootbox.dialog({
-            //     message: '<p class="text-center"><i class="fa fa-spin fa-spinner"></i> Waiting for server response....</p>',
-            //     closeButton: false
-            // });
+            var dialog = bootbox.dialog({
+                message: '<p class="text-center"><i class="fa fa-spin fa-spinner"></i> Waiting for server response....</p>',
+                closeButton: false
+            });
 
 
             $.ajax({
@@ -365,11 +346,19 @@ function getUserIpAddress() {
                 dataType: 'json',
                 success: function (data) {
 
-                    console.log('Hmmm.....', data);
+
+                    bootbox.hideAll();
 
                     if (data.result === 'ok') {
 
+                        $.notify({
+                            title: '<strong>Success!</strong>',
+                            message: data.msg
+                        },{
+                            type: 'success'
+                        });
 
+                        document.getElementById('prd_frm').reset();
 
                     } else {
 
@@ -387,13 +376,26 @@ function getUserIpAddress() {
                                 }
                             })
                         }
+
+                        $.notify({
+                            title: '<strong>Failed!</strong>',
+                            message: data.msg
+                        },{
+                            type: 'danger'
+                        });
                     }
+
+                    setTimeout(function (ev) {
+                        dialog.modal('hide');
+                    }, 1200);
+
                 },
                 error: function (data) {
 
-                    //dialog.modal('hide');
-                },
-                complete: function () {
+                    //this is because this form is too fast before loading ajax request is done...
+                    setTimeout(function (ev) {
+                        dialog.modal('hide');
+                    }, 1200);
 
                 }
             });
