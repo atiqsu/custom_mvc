@@ -324,14 +324,14 @@ function getUserIpAddress() {
 
             clearError('phone_no');
 
-            if(! validateEntryBy(entryBy)) {
-
-                showError('entry_by', 'Only numbers is allowed and can not be longer than 20 characters.');
-
-                return false;
-            }
-
-            clearError('entry_by');
+            // if(! validateEntryBy(entryBy)) {
+            //
+            //     showError('entry_by', 'Only numbers is allowed and can not be longer than 20 characters.');
+            //
+            //     return false;
+            // }
+            //
+            // clearError('entry_by');
 
             let itemNote = document.querySelector('#items_note').value;
             let ipAddress = document.querySelector('#ip_address').value;
@@ -373,6 +373,20 @@ function getUserIpAddress() {
 
                     } else {
 
+                        if(data.errors) {
+
+                            Object.keys(data.errors).forEach(function ($key) {
+
+                                if($key === 'items_name') {
+
+                                    showErrorForItems(data.errors[$key])
+
+                                } else {
+
+                                    showError($key, data.errors[$key]);
+                                }
+                            })
+                        }
                     }
                 },
                 error: function (data) {
@@ -435,6 +449,11 @@ function getUserIpAddress() {
     }
 
 
+    /**
+     *
+     * @param elm
+     * @param $msg
+     */
     function showErrorToElm(elm, $msg) {
 
         addCSSClass(elm, 'is-invalid');
@@ -446,6 +465,19 @@ function getUserIpAddress() {
         node.appendChild(textNode);
 
         elm.parentNode.appendChild(node);
+    }
+
+
+    /**
+     *
+     * @param $msg
+     */
+    function showErrorForItems($msg) {
+
+        let itemsElm = document.querySelectorAll('input[name="items_name[]"]');
+        let first    = itemsElm.item(0);
+
+        showErrorToElm(first, $msg);
     }
 
 
@@ -636,6 +668,7 @@ function getUserIpAddress() {
             elm.value = '880' + val;
         }
     }
+
 
 </script>
 </body>

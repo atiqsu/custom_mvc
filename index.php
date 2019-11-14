@@ -5,10 +5,18 @@
  * Time: 12:59 PM
  */
 
+session_start();
+
+date_default_timezone_set('UTC');
+//date_default_timezone_set('Asia/Dhaka');
+
 require './config.php';
 require './helpers.php';
 require './routes.php';
-require './Core/Config.php';
+
+$files = glob('./Core/*.php');
+
+foreach ($files as $file) { require($file); }
 
 $files = glob('./Controller/*Controller.php');
 

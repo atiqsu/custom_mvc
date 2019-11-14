@@ -8,36 +8,32 @@
 namespace Model;
 
 
-use App\Core\Config;
-
+/**
+ * Class Model
+ *
+ * @author Md. Atiqur Rahman <atiqur.su@gmail.com, atiqur@shaficonsultancy.com>
+ * @package Model
+ */
 abstract class Model {
 
     protected $primaryKey = 'id';
 
-    protected $config;
+    protected $dbCon;
 
     protected $sqlError;
 
 
-    public static function find(int $pk) {
+    public function __construct(\mysqli $dbConnection) {
 
-        $model = new static();
-
-        $tbl = empty($model->table) ? strtolower(static::class) : $model->table;
-
-        return 'select * from '.$tbl. ' where `'.$model->primaryKey.'` = '.$pk;
-
+        $this->dbCon = $dbConnection;
     }
 
 
-    public static function getPK() {
-
-        $obj = new static();
-
-        return $obj->primaryKey;
-    }
-
-
+    /**
+     *
+     * @author Md. Atiqur Rahman <atiqur.su@gmail.com, atiqur@shaficonsultancy.com>
+     * @return string
+     */
     public function getPrimaryKey() {
 
         return $this->primaryKey;
@@ -53,16 +49,20 @@ abstract class Model {
 
         $arr = get_object_vars($this);
 
-        dd('wtttttttttfffff....', $arr);
+        $conn = $this->getDbCon();
 
-        $model = new static();
+        $model = new static($conn);
+
+        $notAColumn = get_object_vars($model); #Removing class properties from query building....
 
         $tbl = empty($model->table) ? strtolower(static::class) : $model->table;
 
         $pk = $arr['primaryKey'];
 
-        unset($arr['table'], $arr['primaryKey'], $arr['dbCon']);
+        foreach($notAColumn as $col => $val0) {
 
+            unset($arr[$col]);
+        }
 
         $qry = 'INSERT INTO '.$tbl.' (';
 
@@ -71,20 +71,16 @@ abstract class Model {
 
         foreach($arr as $col => $value) {
 
-            //$value = str_replace('"', '\'', $this->$col); #todo - poor try to make it SQLInjection fre :P , need to use prepared statement later when refactoring...
+            $value = str_replace('"', '\'', $this->$col); #todo - poor try to make it SQLInjection fre :P , need to use prepared statement later when refactoring...
 
             $qry .= $sep.'`'.$col.'`';
 
-            $val .= $sep.'"'.$model->$col.'"';
+            $val .= $sep.'"'.$value.'"';
 
             $sep = ', ';
         }
 
         $qry .= ') VALUES ('.$val.');';
-
-        $conn = $model->config->getDbConnection();
-
-        dd('wtf.....', $conn);
 
         if ($conn->query($qry) === true) {
 
@@ -120,4 +116,20 @@ abstract class Model {
     }
 
 
+    /**
+     * @return \mysqli
+     */
+    public function getDbCon(): \mysqli {
+
+        return $this->dbCon;
+    }
+
+
+    /**
+     * @param \mysqli $dbCon
+     */
+    public function setDbCon(\mysqli $dbCon): void {
+
+        $this->dbCon = $dbCon;
+    }
 }

@@ -13,8 +13,6 @@ use App\Core\Config;
 
 class Base {
 
-    protected $dbConnection;
-
     protected $config;
 
 
