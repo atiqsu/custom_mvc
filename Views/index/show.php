@@ -70,14 +70,14 @@
 
 <div class="container">
 
-    <h1 class="hdr">My First Bootstrap Page</h1>
+    <h1 class="hdr">My first framework...</h1>
 
     <br/>
 
     <div class="row">
 
         <div class="col-sm-1">Date:</div>
-        <div class="col-sm-6">
+        <div class="col-sm-5">
             <div class="input-daterange input-group" id="dt_pkr">
                 <input type="text" class="input-sm form-control" id="min">
                 <span class="input-group-addon">to</span>
@@ -92,6 +92,8 @@
                 <option value="">Select</option>
             </select>
         </div>
+
+        <div class="col-sm-1"><a href="/add" class="btn btn-primary">Add</a></div>
 
     </div>
     <div class="row">
